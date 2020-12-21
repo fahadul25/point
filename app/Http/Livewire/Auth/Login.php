@@ -6,6 +6,8 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
+
+
 class Login extends Component
 {
     /** @var string */
@@ -25,6 +27,9 @@ class Login extends Component
     public function authenticate()
     {
         $this->validate();
+
+        //this function will enable user to login without password
+        
 
         if (!Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             $this->addError('email', trans('auth.failed'));

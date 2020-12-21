@@ -8,11 +8,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 use Livewire\Component;
+use App\Models\Tenant;
 
 class Register extends Component
 {
     /** @var string */
     public $name = '';
+
+    /** @var string */
+    public $companyName = '';
 
     /** @var string */
     public $email = '';
@@ -26,16 +30,25 @@ class Register extends Component
     public function register()
     {
         $this->validate([
-            'name' => ['required'],
+            'name' => ['required', 'string', 'min:10'],
+            'companyName' => ['required', 'string', 'unique:tenants,name'],
             'email' => ['required', 'email', 'unique:users'],
-            'password' => ['required', 'min:8', 'same:passwordConfirmation'],
+            'password' => ['required', 'min:6', 'same:passwordConfirmation'],
+        ]);
+
+        $tenant = Tenant::create([
+            'name' => $this->companyName,
         ]);
 
         $user = User::create([
             'email' => $this->email,
             'name' => $this->name,
+            'role' =>'admin',
             'password' => Hash::make($this->password),
+            'tenant_id'=> $tenant->id,
         ]);
+
+        $user->sendEmailVerificationNotification();
 
         event(new Registered($user));
 
@@ -44,8 +57,11 @@ class Register extends Component
         return redirect()->intended(route('home'));
     }
 
-    public function render()
-    {
-        return view('livewire.auth.register')->extends('layouts.auth');
+    public function updated($value) {
+        $this->resetErrorBag($value);
     }
+
+        public function render(){
+            return view('livewire.auth.register')->extends('layouts.auth');
+        }
 }

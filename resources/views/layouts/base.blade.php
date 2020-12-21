@@ -16,6 +16,10 @@
         <!-- Fonts -->
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 
+        <style>
+        [x-cloak]{display:none}
+        </style>
+
         <!-- Styles -->
         <link rel="stylesheet" href="{{ url(mix('css/app.css')) }}">
         @livewireStyles
